@@ -113,15 +113,11 @@ class TimerGadget(AlexaGadget):
         while self.timer_token and time_remaining > 0:
             time_total = self.timer_end_time - start_time
             time_remaining = max(0, self.timer_end_time - time.time())
-            #Adding time_pi =  this should give the correct amount for the pwm
-            if time_remaining > 1:          
-                time_pi = math.log(time_remaining,2)/8-1
-            else time_pi = (time_remaining/60/8)
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
                 self._set_servo_to_angle(cur_angle, timeout=0.3)
                 #adding my_pwm
-                my_pwm.start(time_pi*100)
+                my_pwm.start(cur_angle/180)
                 cur_angle = next_angle
             time.sleep(0.2)
 
