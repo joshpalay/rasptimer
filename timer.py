@@ -10,6 +10,7 @@ import logging
 import sys
 import threading
 import time
+import math
 
 # Adding this from other file
 #
@@ -114,15 +115,19 @@ class TimerGadget(AlexaGadget):
             time_total = self.timer_end_time - start_time
             time_remaining = max(0, self.timer_end_time - time.time())
             #Adding time_pi =  this should give the correct amount for the pwm but need to convert the time from seconds to minutes
+            logger.info('Setting time_remaining to: ' + str(time_remaining))
             if time_remaining > 60:          
-                time_pi = math.log((time_remaining/60),2)/8-1
-            else
+                time_pi = (math.log((time_remaining/60),2)+1)/8
+            else:
                 time_pi = (time_remaining/60/8)
-            logger.debug('Setting timepi to: ' + str(time_pi))
+            logger.info('Setting timepi to: ' + str(time_pi))
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
                 self._set_servo_to_angle(cur_angle, timeout=0.3)
                 #adding my_pwm
+                if time_pi>1:
+                        time_pi=1
+                        #If the time is too high, go to max
                 my_pwm.start(time_pi*100)
                 cur_angle = next_angle
             time.sleep(0.2)
