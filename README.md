@@ -1,3 +1,5 @@
+# I am hoping this will show up in Git
+
 # Timer Gadget
 
 ![Hardware requirements](../../../docs/_static/images/timer_gadget.png)
