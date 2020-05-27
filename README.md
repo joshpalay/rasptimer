@@ -1,4 +1,4 @@
-# I am hoping this will show up in Git
+# I am hoping this will show up in Git - IT DOES!
 
 # Timer Gadget
 
