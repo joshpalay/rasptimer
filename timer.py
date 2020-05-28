@@ -106,9 +106,11 @@ class TimerGadget(AlexaGadget):
         """
         # check every 200ms if we should rotate the servo
         cur_angle = 180
-        #adding my_pwm
-        my_pwm.start(cur_angle/180)
+        #adding my_pwm and putting it to full at the beginning
+        my_pwm.start(100)
+        #start time is right now!
         start_time = time.time()
+        #time remaining is how much time is left of the timer
         time_remaining = self.timer_end_time - start_time
         self._set_servo_to_angle(cur_angle, timeout=1)
         while self.timer_token and time_remaining > 0:
@@ -116,6 +118,8 @@ class TimerGadget(AlexaGadget):
             time_remaining = max(0, self.timer_end_time - time.time())
             #Adding time_pi =  this should give the correct amount for the pwm but need to convert the time from seconds to minutes
             logger.info('Setting time_remaining to: ' + str(time_remaining))
+            #if the time is greater than 1 minute, do a log*2 of the time and add one.
+            #if the time is less than 1 minute, just count down the time
             if time_remaining > 60:          
                 time_pi = (math.log((time_remaining/60),2)+1)/8
             else:
@@ -124,7 +128,7 @@ class TimerGadget(AlexaGadget):
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
                 self._set_servo_to_angle(cur_angle, timeout=0.3)
-                #adding my_pwm
+                #adding my_pwm - this is if the time is greater than 2 hours....
                 if time_pi>1:
                         time_pi=1
                         #If the time is too high, go to max
