@@ -19,10 +19,10 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(10,GPIO.OUT)
-my_pwm=GPIO.PWM(10,100)
 
+#Establish and start a PWM on GPIO 10 at 100hz.  Start at 100%
+my_pwm=GPIO.PWM(10,100)
 my_pwm.start(100)
-# done Adding from other file
 
 from gpiozero import AngularServo
 import dateutil.parser
@@ -110,8 +110,9 @@ class TimerGadget(AlexaGadget):
         my_pwm.start(100)
         #start time is right now!
         start_time = time.time()
-        #time remaining is how much time is left of the timer
+        #time remaining is how much time is left of the timer: end time minus the time it started
         time_remaining = self.timer_end_time - start_time
+        #Moves angles all the the current angle (180)
         self._set_servo_to_angle(cur_angle, timeout=1)
         while self.timer_token and time_remaining > 0:
             time_total = self.timer_end_time - start_time
