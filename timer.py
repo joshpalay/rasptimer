@@ -10,19 +10,22 @@ import logging
 import sys
 import threading
 import time
-import math
+
+#NEW CODE
+const Gpio = require('pigpio').Gpio
+const meter = new Gpio(10, {mode: Gpio.OUTPUT});
+#END NEW CODE
 
 # Adding this from other file
 #
+#import RPi.GPIO as GPIO
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setwarnings(False)
+#GPIO.setup(10,GPIO.OUT)
+#my_pwm=GPIO.PWM(10,100)
+#my_pwm.start(100)
 
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-GPIO.setup(10,GPIO.OUT)
-
-#Establish and start a PWM on GPIO 10 at 100hz.  Start at 100%
-my_pwm=GPIO.PWM(10,100)
-my_pwm.start(100)
+# done Adding from other file
 
 from gpiozero import AngularServo
 import dateutil.parser
@@ -106,34 +109,27 @@ class TimerGadget(AlexaGadget):
         """
         # check every 200ms if we should rotate the servo
         cur_angle = 180
-        #adding my_pwm and putting it to full at the beginning
-        my_pwm.start(100)
-        #start time is right now!
+        #adding my_pwm
+        my_pwm.start(cur_angle/180)
         start_time = time.time()
-        #time remaining is how much time is left of the timer: end time minus the time it started
         time_remaining = self.timer_end_time - start_time
-        #Moves angles all the the current angle (180)
         self._set_servo_to_angle(cur_angle, timeout=1)
         while self.timer_token and time_remaining > 0:
             time_total = self.timer_end_time - start_time
             time_remaining = max(0, self.timer_end_time - time.time())
             #Adding time_pi =  this should give the correct amount for the pwm but need to convert the time from seconds to minutes
-            logger.info('Setting time_remaining to: ' + str(time_remaining))
-            #if the time is greater than 1 minute, do a log*2 of the time and add one.
-            #if the time is less than 1 minute, just count down the time
             if time_remaining > 60:          
-                time_pi = (math.log((time_remaining/60),2)+1)/8
-            else:
+                time_pi = math.log((time_remaining/60),2)/8-1
+            else
                 time_pi = (time_remaining/60/8)
-            logger.info('Setting timepi to: ' + str(time_pi))
+            logger.debug('Setting timepi to: ' + str(time_pi))
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
                 self._set_servo_to_angle(cur_angle, timeout=0.3)
-                #adding my_pwm - this is if the time is greater than 2 hours....
-                if time_pi>1:
-                        time_pi=1
-                        #If the time is too high, go to max
-                my_pwm.start(time_pi*100)
+                #adding my_pwm
+                #my_pwm.start(time_pi*100)
+                #New
+                meter.pwmWrite(time_pi*100/255)
                 cur_angle = next_angle
             time.sleep(0.2)
 
@@ -141,14 +137,17 @@ class TimerGadget(AlexaGadget):
         # until timer is cancelled
         while self.timer_token:
             self._set_servo_to_angle(175, timeout=1)
-            my_pwm.start(100)
+            #my_pwm.start(100)
+            meter.pwmWrite(255)
             self._set_servo_to_angle(5, timeout=1)
-            my_pwm.start(0)
+            #my_pwm.start(0)
+            meter.pwmWrite(0)
             
 
         # the timer was cancelled, reset the servo back to initial state
         self._set_servo_to_angle(0, timeout=1)
-        my_pwm.start(0)
+        #my_pwm.start(0)
+        meter.pwmWrite(0)
 
     def _set_servo_to_angle(self, angle_in_degrees, timeout):
         """
