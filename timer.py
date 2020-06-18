@@ -150,13 +150,14 @@ class TimerGadget(AlexaGadget):
             else
                 time_pi = (time_remaining/60/8)
             logger.debug('Setting timepi to: ' + str(time_pi))
+            logger.debug('Setting the voltmeter to: ' + str(time_pi*2550))
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
                 self._set_servo_to_angle(cur_angle, timeout=0.3)
                 #adding my_pwm
                 #my_pwm.start(time_pi*100)
                 #New
-                pwm.set_servo_pulsewidth( volt, time_pi*100/255/2500 ) ;
+                pwm.set_PWM_dutycycle( volt, time_pi*2550) ;
                 cur_angle = next_angle
             time.sleep(0.2)
 
