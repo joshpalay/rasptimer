@@ -10,10 +10,36 @@ import logging
 import sys
 import threading
 import time
+import pigpio
+import RPi.GPIO as GPIO
+
 
 #NEW CODE
-const Gpio = require('pigpio').Gpio
-const meter = new Gpio(10, {mode: Gpio.OUTPUT});
+volt = 10
+
+pwm = pigpio.pi() 
+pwm.set_mode(volt, pigpio.OUTPUT)
+
+pwm.set_PWM_frequency( volt, 50 )
+ 
+print( "0 deg" )
+pwm.set_servo_pulsewidth( volt, 500 ) ;
+time.sleep( 3 )
+ 
+print( "90 deg" )
+pwm.set_servo_pulsewidth( volt, 1500 ) ;
+time.sleep( 3 )
+ 
+print( "180 deg" )
+pwm.set_servo_pulsewidth( volt, 2500 ) ;
+time.sleep( 3 )
+ 
+# turning off servo
+pwm.set_PWM_dutycycle(volt, 0)
+pwm.set_PWM_frequency( volt, 0 )
+
+
+
 #END NEW CODE
 
 # Adding this from other file
@@ -110,7 +136,8 @@ class TimerGadget(AlexaGadget):
         # check every 200ms if we should rotate the servo
         cur_angle = 180
         #adding my_pwm
-        my_pwm.start(cur_angle/180)
+        #my_pwm.start(cur_angle/180)
+        pwm.set_servo_pulsewidth( volt, 2500 ) ;
         start_time = time.time()
         time_remaining = self.timer_end_time - start_time
         self._set_servo_to_angle(cur_angle, timeout=1)
@@ -129,7 +156,7 @@ class TimerGadget(AlexaGadget):
                 #adding my_pwm
                 #my_pwm.start(time_pi*100)
                 #New
-                meter.pwmWrite(time_pi*100/255)
+                pwm.set_servo_pulsewidth( volt, time_pi*100/255/2500 ) ;
                 cur_angle = next_angle
             time.sleep(0.2)
 
@@ -138,16 +165,19 @@ class TimerGadget(AlexaGadget):
         while self.timer_token:
             self._set_servo_to_angle(175, timeout=1)
             #my_pwm.start(100)
-            meter.pwmWrite(255)
+            pwm.set_servo_pulsewidth( volt, 2500 ) ; 
+            #meter.pwmWrite(255)
             self._set_servo_to_angle(5, timeout=1)
+            pwm.set_servo_pulsewidth( volt, 0 ) ; 
             #my_pwm.start(0)
-            meter.pwmWrite(0)
+            #meter.pwmWrite(0)
             
 
         # the timer was cancelled, reset the servo back to initial state
         self._set_servo_to_angle(0, timeout=1)
         #my_pwm.start(0)
-        meter.pwmWrite(0)
+        #meter.pwmWrite(0)
+        pwm.set_servo_pulsewidth( volt, 0 ) ; 
 
     def _set_servo_to_angle(self, angle_in_degrees, timeout):
         """
