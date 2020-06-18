@@ -12,6 +12,7 @@ import threading
 import time
 import pigpio
 import RPi.GPIO as GPIO
+import math
 
 
 #NEW CODE
@@ -23,15 +24,15 @@ pwm.set_mode(volt, pigpio.OUTPUT)
 pwm.set_PWM_frequency( volt, 50 )
  
 print( "0 deg" )
-pwm.set_servo_pulsewidth( volt, 500 ) ;
+pwm.set_PWM_dutycycle( volt, 50 ) ;
 time.sleep( 3 )
  
 print( "90 deg" )
-pwm.set_servo_pulsewidth( volt, 1500 ) ;
+pwm.set_PWM_dutycycle( volt, 125 ) ;
 time.sleep( 3 )
  
 print( "180 deg" )
-pwm.set_servo_pulsewidth( volt, 2500 ) ;
+pwm.set_PWM_dutycycle( volt, 255 ) ;
 time.sleep( 3 )
  
 # turning off servo
@@ -137,7 +138,7 @@ class TimerGadget(AlexaGadget):
         cur_angle = 180
         #adding my_pwm
         #my_pwm.start(cur_angle/180)
-        pwm.set_servo_pulsewidth( volt, 2500 ) ;
+        pwm.set_PWM_dutycycle( volt, 255 ) ;
         start_time = time.time()
         time_remaining = self.timer_end_time - start_time
         self._set_servo_to_angle(cur_angle, timeout=1)
@@ -145,19 +146,24 @@ class TimerGadget(AlexaGadget):
             time_total = self.timer_end_time - start_time
             time_remaining = max(0, self.timer_end_time - time.time())
             #Adding time_pi =  this should give the correct amount for the pwm but need to convert the time from seconds to minutes
-            if time_remaining > 60:          
-                time_pi = math.log((time_remaining/60),2)/8-1
-            else
-                time_pi = (time_remaining/60/8)
-            logger.debug('Setting timepi to: ' + str(time_pi))
-            logger.debug('Setting the voltmeter to: ' + str(time_pi*2550))
+            if time_remaining > 60:
+            #time_pi is a percent of what the PMW should be
+                time_pi = (math.log((time_remaining/60),2)+1)/8
+                if time_pi > 1: time_pi=1 ;
+            else:
+                time_pi = (time_remaining/60/16)
+            
+            logger.info('Remaing time is ' + str(time_remaining))
+            logger.info('Setting timepi to: ' + str(time_pi))
+            logger.info('Setting the voltmeter to: ' + str(time_pi*255))
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
                 self._set_servo_to_angle(cur_angle, timeout=0.3)
                 #adding my_pwm
                 #my_pwm.start(time_pi*100)
                 #New
-                pwm.set_PWM_dutycycle( volt, time_pi*2550) ;
+                
+                pwm.set_PWM_dutycycle( volt, time_pi*255) ;
                 cur_angle = next_angle
             time.sleep(0.2)
 
