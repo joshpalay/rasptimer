@@ -151,7 +151,7 @@ class TimerGadget(AlexaGadget):
                 time_pi = (math.log((time_remaining/60),2)+1)/8
                 if time_pi > 1: time_pi=1 ;
             else:
-                time_pi = (time_remaining/60/16)
+                time_pi = (time_remaining/60/8)
             
             logger.info('Remaing time is ' + str(time_remaining))
             logger.info('Setting timepi to: ' + str(time_pi))
@@ -170,11 +170,11 @@ class TimerGadget(AlexaGadget):
         # the timer is expired now, rotate servo back and forth
         # until timer is cancelled
         while self.timer_token:
-           # self._set_servo_to_angle(175, timeout=1)
+            self._set_servo_to_angle(175, timeout=1)
             #my_pwm.start(100)
             pwm.set_servo_pulsewidth( volt, 2500 ) ; 
             #meter.pwmWrite(255)
-            #self._set_servo_to_angle(5, timeout=1)
+            self._set_servo_to_angle(5, timeout=1)
             pwm.set_servo_pulsewidth( volt, 0 ) ; 
             #my_pwm.start(0)
             #meter.pwmWrite(0)
