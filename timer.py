@@ -21,10 +21,10 @@ volt = 10
 pwm = pigpio.pi() 
 pwm.set_mode(volt, pigpio.OUTPUT)
 
-pwm.set_PWM_frequency( volt, 50 )
+pwm.set_PWM_frequency( volt, 100 )
  
 print( "0 deg" )
-pwm.set_PWM_dutycycle( volt, 50 ) ;
+pwm.set_PWM_dutycycle( volt, 1 ) ;
 time.sleep( 3 )
  
 print( "90 deg" )
@@ -37,9 +37,9 @@ time.sleep( 3 )
  
 # turning off servo
 pwm.set_PWM_dutycycle(volt, 0)
-pwm.set_PWM_frequency( volt, 0 )
+#pwm.set_PWM_frequency( volt, 0 )
 
-
+#pwm.set_PWM_dutycycle( volt, 155) ;
 
 #END NEW CODE
 
@@ -138,10 +138,10 @@ class TimerGadget(AlexaGadget):
         cur_angle = 180
         #adding my_pwm
         #my_pwm.start(cur_angle/180)
-        pwm.set_PWM_dutycycle( volt, 255 ) ;
+        #pwm.set_PWM_dutycycle( volt, 255 ) ;
         start_time = time.time()
         time_remaining = self.timer_end_time - start_time
-        self._set_servo_to_angle(cur_angle, timeout=1)
+        #self._set_servo_to_angle(cur_angle, timeout=1)
         while self.timer_token and time_remaining > 0:
             time_total = self.timer_end_time - start_time
             time_remaining = max(0, self.timer_end_time - time.time())
@@ -155,26 +155,26 @@ class TimerGadget(AlexaGadget):
             
             logger.info('Remaing time is ' + str(time_remaining))
             logger.info('Setting timepi to: ' + str(time_pi))
-            logger.info('Setting the voltmeter to: ' + str(time_pi*255))
+            logger.info('Setting the voltmeter to: ' + str(time_pi*2550))
             next_angle = int(180 * time_remaining / time_total)
             if cur_angle != next_angle:
-                self._set_servo_to_angle(cur_angle, timeout=0.3)
+              #  self._set_servo_to_angle(cur_angle, timeout=0.3)
                 #adding my_pwm
                 #my_pwm.start(time_pi*100)
                 #New
                 
                 pwm.set_PWM_dutycycle( volt, time_pi*255) ;
                 cur_angle = next_angle
-            time.sleep(0.2)
+            time.sleep(.2)
 
         # the timer is expired now, rotate servo back and forth
         # until timer is cancelled
         while self.timer_token:
-            self._set_servo_to_angle(175, timeout=1)
+           # self._set_servo_to_angle(175, timeout=1)
             #my_pwm.start(100)
             pwm.set_servo_pulsewidth( volt, 2500 ) ; 
             #meter.pwmWrite(255)
-            self._set_servo_to_angle(5, timeout=1)
+            #self._set_servo_to_angle(5, timeout=1)
             pwm.set_servo_pulsewidth( volt, 0 ) ; 
             #my_pwm.start(0)
             #meter.pwmWrite(0)
