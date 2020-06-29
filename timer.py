@@ -172,10 +172,10 @@ class TimerGadget(AlexaGadget):
         while self.timer_token:
             self._set_servo_to_angle(175, timeout=1)
             #my_pwm.start(100)
-            pwm.set_servo_pulsewidth( volt, 2500 ) ; 
+            pwm.set_PWM_dutycycle( volt, 255 ) ; 
             #meter.pwmWrite(255)
             self._set_servo_to_angle(5, timeout=1)
-            pwm.set_servo_pulsewidth( volt, 0 ) ; 
+            pwm.set_PWM_dutycycle( volt, 0 ) ; 
             #my_pwm.start(0)
             #meter.pwmWrite(0)
             
@@ -184,7 +184,7 @@ class TimerGadget(AlexaGadget):
         self._set_servo_to_angle(0, timeout=1)
         #my_pwm.start(0)
         #meter.pwmWrite(0)
-        pwm.set_servo_pulsewidth( volt, 0 ) ; 
+        pwm.set_PWM_dutycycle( volt, 0 ) ; 
 
     def _set_servo_to_angle(self, angle_in_degrees, timeout):
         """
